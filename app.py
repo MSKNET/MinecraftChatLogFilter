@@ -45,6 +45,20 @@ class MinecraftChatLog:
                 continue
             context.append(self.chat_log[i])
         return context
+    def statistic_source(self, keyword, sender_list, source_list):
+        filtered_chat_log = self.filter(keyword, sender_list, source_list)
+        statistic_data = {'statistic_source_list': []}
+        for m in filtered_chat_log:
+            if m['Source'] not in statistic_data['statistic_source_list']:
+                statistic_data["statistic_source_list"].append(m['Source'])
+                statistic_data[m['Source']] = 0
+        for m in filtered_chat_log:
+            statistic_data[m['Source']] = statistic_data[m['Source']] + 1
+        
+        statistic_data['statistic_sender_list'] = sender_list
+        statistic_data['statistic_keyword'] = keyword
+        statistic_data['statistic_total_number'] = len(filtered_chat_log) 
+        return statistic_data
 
 
 def allowed_file(filename):
@@ -134,6 +148,25 @@ def context():
     else:
         return redirect(url_for('index'))
 
+@app.route('/statistics', methods=['GET', 'POST'])
+def statistics():
+    if request.method == 'POST':
+        keyword = request.json['keyword']
+        sender_list = request.json['sender_list']
+        source_list = request.json['source_list']
+        statistics_type = request.json['statistics_type']
+        file_uuid = request.cookies.get('file_uuid')
+        with open(
+                os.path.join(app.config['UPLOAD_FOLDER'],
+                             file_uuid + '.json')) as f:
+            chat_log = json.load(f)
+            chat_log = MinecraftChatLog(chat_log)
+            
+            if statistics_type == 'source':
+                statistics_data = chat_log.statistic_source(keyword,sender_list,source_list)
+                return render_template('./statistics/source.html', data=statistics_data)
+    else:
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     # app.debug = True

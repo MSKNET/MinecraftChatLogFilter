@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <div id="load_files">
+  <div id="filter">
     <h1>筛选器</h1>
     {% if show_import %}
     <div id="import_files">
@@ -22,7 +22,7 @@
     </div>
     {% endif %}
     <h3>内容包含字符串</h3>
-    <input placeholder="留空表示无限制" id="keyword" value="">
+    <input placeholder="留空表示无限制" id="keyword" value="" style="width: 100%;">
     <h3>发送者 (共 {{ chat_log.sender_list|length }} 个可选项)
       <small>
         <a href="javascript:void(0)" onclick="switch_all('senderCheckbox', true)">全选</a> |
@@ -53,8 +53,13 @@
       {% endfor %}
     </div>
     <br>
+    <a href="javascript:void(0)" onclick="get_source_statistic()">按以上条件统计不同来源占比</a> |
+    <a href="javascript:void(0)" onclick="show_sender()">按以上条件统计不同发送者占比</a>
+    <br><br>
     <button onclick="apply()">开始查询符合条件的数据</button>
   </div>
+  <dialog id="statistics">
+  </dialog>
   <div id="data">
   </div>
   <script>
