@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/water.css">
+  <title>筛选器</title>
+</head>
+
+<body>
+  <div id="load_files">
+    <h1>筛选器</h1>
+    <h3>内容包含字符串</h3>
+    <input placeholder="留空表示无限制" id="keyword" value="">
+    <h3>发送者 (共 {{ chat_log.sender_list|length }} 个可选项)
+      <small>
+        <a href="javascript:void(0)" onclick="switch_all('senderCheckbox', true)">全选</a> |
+        <a href="javascript:void(0)" onclick="switch_all('senderCheckbox', false)">全不选</a>
+      </small>
+    </h3>
+    <div id="section_of_sender_list">
+      {% for sender in chat_log.sender_list %}
+      <input type="checkbox" class="senderCheckbox" name="sender_{{ sender }}" id="sender_{{ sender }}"
+        value="{{ sender }}" checked="checked">
+      <label for="sender_{{ sender }}">{{ sender }}</label>
+      {% endfor %}
+    </div>
+    <h3>来源 (共 {{ chat_log.source_list|length }} 个可选项)
+      <small>
+        <a href="javascript:void(0)" onclick="switch_all('sourceCheckbox', true)">全选</a> |
+        <a href="javascript:void(0)" onclick="switch_all('sourceCheckbox', false)">全不选</a>
+      </small>
+    </h3>
+    <div id="section_of_source">
+      {% for source in chat_log.source_list %}
+      <input type="checkbox" class="sourceCheckbox" name="source_{{ source }}" id="source_{{ source }}"
+        value="{{ source }}" checked="checked">
+      <label for="source_{{ source }}">{{ source }}</label>
+      <br />
+      {% endfor %}
+    </div>
+    <br />
+    <button onclick="apply()">开始查询符合条件的数据</button>
+    <br />
+    <span style="color:#0096bfab">满足条件的数据有 {{ chat_log.chat_log|length }} 条</span>
+  </div>
+  <div id="data">
+  </div>
+  <script>
+    function switch_all(elements, status) {
+      var elements = document.getElementsByClassName(elements);
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].checked = status;
+      }
+    }
+
+    function apply() {
+      let keyword = document.getElementById("keyword").value;
+      let sender_list = [];
+      let source_list = [];
+      let sender_elements = document.getElementsByClassName("senderCheckbox");
+      for (let i = 0; i < sender_elements.length; i++) {
+        if (sender_elements[i].checked) {
+          sender_list.push(sender_elements[i].value);
+        }
+      }
+      let source_elements = document.getElementsByClassName("sourceCheckbox");
+      for (let i = 0; i < source_elements.length; i++) {
+        if (source_elements[i].checked) {
+          source_list.push(source_elements[i].value);
+        }
+      }
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/filter", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          document.getElementById("data").innerHTML = xhr.responseText;
+        }
+      }
+      xhr.send(JSON.stringify({
+        "keyword": keyword,
+        "sender_list": sender_list,
+        "source_list": source_list
+      }));
+    }
+
+    function goto_context(sender, time, content, source) {
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/context", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          document.getElementById("data").innerHTML = xhr.responseText;
+          window.location.href = `#${sender}_${time}_${source}`;
+          document.getElementById(`${sender}_${time}_${source}`).innerHTML += `
+          <br /><div style="padding:20px;background-color:#0076d1;color:white;">你正在查看此条目的上下文</div>`;
+        }
+      }
+      xhr.send(JSON.stringify({
+        "sender": sender,
+        "time": time,
+        "message": content,
+        "source": source
+      }));
+    }
+  </script>
+</body>
+
+</html>
