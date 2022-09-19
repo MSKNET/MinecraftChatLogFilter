@@ -24,7 +24,7 @@
 
 <hr><h3>统计结果</h3>
 
-{% for key, value in data['statistic_dict'].items() %}
+{% for key, value in data['statistic_dict'].items()|sort(attribute='1', reverse=True) %}
   <p>
     <span style="color:blue">{{ key }}</span>
     有 <span style="color:blue">{{ value }}</span>
