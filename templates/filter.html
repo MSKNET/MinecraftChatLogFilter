@@ -31,9 +31,10 @@
     </h3>
     <div id="section_of_sender_list">
       {% for sender in chat_log.sender_list %}
-      <input type="checkbox" class="senderCheckbox" name="sender_{{ sender }}" id="sender_{{ sender }}"
-        value="{{ sender }}" checked="checked">
-      <label for="sender_{{ sender }}">{{ sender }}</label>
+      <label for="sender_{{ sender }}">
+        <input type="checkbox" class="senderCheckbox" name="sender_{{ sender }}" id="sender_{{ sender }}"
+          value="{{ sender }}" checked="checked">{{ sender }}
+      </label>
       {% endfor %}
     </div>
     <h3>来源 (共 {{ chat_log.source_list|length }} 个可选项)
@@ -44,9 +45,10 @@
     </h3>
     <div id="section_of_source">
       {% for source in chat_log.source_list %}
-      <input type="checkbox" class="sourceCheckbox" name="source_{{ source }}" id="source_{{ source }}"
-        value="{{ source }}" checked="checked">
-      <label for="source_{{ source }}">{{ source }}</label>
+      <label for="source_{{ source }}">
+        <input type="checkbox" class="sourceCheckbox" name="source_{{ source }}" id="source_{{ source }}"
+          value="{{ source }}" checked="checked">{{ source }}
+      </label>
       <br>
       {% endfor %}
     </div>
