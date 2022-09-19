@@ -1,17 +1,17 @@
 <header>
-    统计不同来源占比
+  统计不同来源占比
 </header>
 
 <p>已选统计条件（只统计下方列出的发送者）：</p>
   
-{% for condition in data['statistic_sender_list'] %}
-    <code style="background-color:lightblue">{{ condition }}</code>
+{% for sender in data['statistic_sender_list'] %}
+  <code style="background-color:lightblue">{{ sender }}</code>
 {% endfor %}
 
 <p>已选统计条件（只统计下方列出的来源）：</p>
 
-{% for condition in data['statistic_source_list'] %}
-    <code style="background-color:lightblue">{{ condition }}</code>
+{% for source in data['statistic_source_list'] %}
+  <code style="background-color:lightblue">{{ source }}</code>
 {% endfor %}
 
 {% if data['statistic_keyword'] != '' %}
@@ -25,5 +25,5 @@
 <hr><h3>统计结果</h3>
 
 {% for source in data['statistic_source_list'] %}
-    <p><span style="color:blue">{{ source }}</span> 有 <span style="color:blue">{{ data[source] }}</span>个符合已选统计条件条目，占比 <span style="color:blue"> {{ (data[source]/data['statistic_total_number'])*100 }} %</span></p>
+  <p><span style="color:blue">{{ source }}</span> 有 <span style="color:blue">{{ data[source] }}</span>个符合已选统计条件条目，占比 <span style="color:blue"> {{ (data[source]/data['statistic_total_number'])*100 }} %</span></p>
 {% endfor %}

@@ -45,6 +45,7 @@ class MinecraftChatLog:
                 continue
             context.append(self.chat_log[i])
         return context
+
     def statistic_source(self, keyword, sender_list, source_list):
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
         statistic_data = {'statistic_source_list': []}
@@ -52,12 +53,12 @@ class MinecraftChatLog:
             if m['Source'] not in statistic_data['statistic_source_list']:
                 statistic_data["statistic_source_list"].append(m['Source'])
                 statistic_data[m['Source']] = 0
-        for m in filtered_chat_log:
-            statistic_data[m['Source']] = statistic_data[m['Source']] + 1
-        
+            else:
+                statistic_data[m['Source']] += 1
+
         statistic_data['statistic_sender_list'] = sender_list
         statistic_data['statistic_keyword'] = keyword
-        statistic_data['statistic_total_number'] = len(filtered_chat_log) 
+        statistic_data['statistic_total_number'] = len(filtered_chat_log)
         return statistic_data
 
 
@@ -75,12 +76,15 @@ def index():
     if request.method == 'GET':
         if 'file_uuid' in request.cookies:
             file_uuid = request.cookies.get('file_uuid')
-            filename = os.path.join(app.config['UPLOAD_FOLDER'], file_uuid + '.json')
+            filename = os.path.join(app.config['UPLOAD_FOLDER'],
+                                    file_uuid + '.json')
             if os.path.exists(filename):
                 with open(filename, 'r') as f:
                     chat_log = json.load(f)
                 chat_log = MinecraftChatLog(chat_log)
-                return render_template('filter.html', chat_log=chat_log, show_import=True)
+                return render_template('filter.html',
+                                       chat_log=chat_log,
+                                       show_import=True)
         return render_template('index.html')
     elif request.method == 'POST':
         file = request.files['file']
@@ -148,6 +152,7 @@ def context():
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/statistics', methods=['GET', 'POST'])
 def statistics():
     if request.method == 'POST':
@@ -161,12 +166,15 @@ def statistics():
                              file_uuid + '.json')) as f:
             chat_log = json.load(f)
             chat_log = MinecraftChatLog(chat_log)
-            
+
             if statistics_type == 'source':
-                statistics_data = chat_log.statistic_source(keyword,sender_list,source_list)
-                return render_template('./statistics/source.html', data=statistics_data)
+                statistics_data = chat_log.statistic_source(
+                    keyword, sender_list, source_list)
+                return render_template('./statistics/source.html',
+                                       data=statistics_data)
     else:
         return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     # app.debug = True
