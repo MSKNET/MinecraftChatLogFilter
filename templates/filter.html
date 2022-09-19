@@ -13,13 +13,17 @@
   <div id="filter">
     <h1>筛选器</h1>
     {% if show_import %}
-    <div id="import_files">
-      <h3>自动使用了已上传的文件，可重新导入新文件</h3>
-      <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" id="file" accept=".json">
-        <input type="submit" value="上传">
-      </form>
-    </div>
+    <details>
+      <summary>
+        （已自动使用了已上传的文件，点击此处可重新导入新文件）
+      </summary>
+      <div id="import_files">
+        <form action="/" method="post" enctype="multipart/form-data">
+          <input type="file" name="file" id="file" accept=".json">
+          <input type="submit" value="上传">
+        </form>
+      </div>
+    </details>
     {% endif %}
     <h3>内容包含字符串</h3>
     <input placeholder="留空表示无限制" id="keyword" value="" style="width: 100%;">
@@ -91,7 +95,12 @@
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
-          document.getElementById("data").innerHTML = xhr.responseText;
+          if(statistics_type === null){
+            document.getElementById("data").innerHTML = xhr.responseText;
+          }else{
+            document.getElementById("statistics").showModal();
+            document.getElementById("statistics").innerHTML = xhr.responseText;
+          }
         }
       }
       xhr.send(JSON.stringify({

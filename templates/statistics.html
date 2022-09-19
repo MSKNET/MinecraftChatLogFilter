@@ -2,33 +2,48 @@
   统计不同来源占比
 </header>
 
-<p>已选统计条件（只统计下方列出的发送者）：</p>
+<details>
+  <summary>点击此处查看已选择的统计条件</summary>
+  <p>已选统计条件（只统计下方列出的发送者）：</p>
+
+  <div>
+    {% for sender in data['statistic_sender_list'] %}
+    <code style="background-color:lightblue">{{ sender }}</code>
+    {% endfor %}
+    <br><br>
+  </div>
+
+  <p>已选统计条件（只统计下方列出的来源）：</p>
+
+  <div>
+    {% for source in data['statistic_source_list'] %}
+    <code style="background-color:lightblue">{{ source }}</code>
+    {% endfor %}
+    <br><br>
+  </div>
   
-{% for sender in data['statistic_sender_list'] %}
-  <code style="background-color:lightblue">{{ sender }}</code>
-{% endfor %}
+  {% if data['statistic_keyword'] != '' %}
+  <p>已选统计条件（只统计包含下面的字符串的条目）：</p>
+  <div>
+    <code style="background-color:lightblue">{{ data['statistic_keyword'] }}</code>
+  </div>
+  {% endif %}
+</details>
 
-<p>已选统计条件（只统计下方列出的来源）：</p>
 
-{% for source in data['statistic_source_list'] %}
-  <code style="background-color:lightblue">{{ source }}</code>
-{% endfor %}
 
-{% if data['statistic_keyword'] != '' %}
-
-<p>已选统计条件（只统计包含下面的字符串的条目）：</p>
-
-{% endif %}
-
-<code style="background-color:lightblue">{{ data['statistic_keyword'] }}</code>
-
-<hr><h3>统计结果</h3>
+<hr>
+<h3>统计结果</h3>
 
 {% for key, value in data['statistic_dict'].items()|sort(attribute='1', reverse=True) %}
-  <p>
-    <span style="color:blue">{{ key }}</span>
-    有 <span style="color:blue">{{ value }}</span>
-    个符合已选统计条件条目，占比
-    <span style="color:blue"> {{ (value/data['statistic_total_number'])*100 }} %</span>
-  </p>
+<p>
+  <span style="color:blue">{{ key }}</span>
+  有 <span style="color:blue">{{ value }}</span>
+  个符合已选统计条件条目，占比
+  <span style="color:blue"> {{ (value/data['statistic_total_number'])*100 }} %</span>
+</p>
 {% endfor %}
+
+<form method="dialog">
+  <menu> <button value="ok">关闭窗口</button></menu>
+</form>
