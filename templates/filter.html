@@ -38,12 +38,12 @@
       <input type="checkbox" class="sourceCheckbox" name="source_{{ source }}" id="source_{{ source }}"
         value="{{ source }}" checked="checked">
       <label for="source_{{ source }}">{{ source }}</label>
-      <br />
+      <br>
       {% endfor %}
     </div>
-    <br />
+    <br>
     <button onclick="apply()">开始查询符合条件的数据</button>
-    <br />
+    <hr>
     <span style="color:#0096bfab">满足条件的数据有 {{ chat_log.chat_log|length }} 条</span>
   </div>
   <div id="data">
@@ -96,7 +96,7 @@
           document.getElementById("data").innerHTML = xhr.responseText;
           window.location.href = `#${sender}_${time}_${source}`;
           document.getElementById(`${sender}_${time}_${source}`).innerHTML += `
-          <br /><div style="padding:20px;background-color:#0076d1;color:white;">你正在查看此条目的上下文</div>`;
+          <br><div style="padding:20px;background-color:#0076d1;color:white;">你正在查看此条目的上下文</div>`;
         }
       }
       xhr.send(JSON.stringify({
