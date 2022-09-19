@@ -25,5 +25,5 @@
 <hr><h3>统计结果</h3>
 
 {% for source in data['statistic_source_list'] %}
-  <p><span style="color:blue">{{ source }}</span> 有 <span style="color:blue">{{ data[source] }}</span>个符合已选统计条件条目，占比 <span style="color:blue"> {{ (data[source]/data['statistic_total_number'])*100 }} %</span></p>
+  <p><span style="color:blue">{{ source }}</span> 有 <span style="color:blue">{{ data[source] }}</span> 个符合已选统计条件条目，占比 <span style="color:blue"> {{ (data[source]/data['statistic_total_number'])*100 }} %</span></p>
 {% endfor %}

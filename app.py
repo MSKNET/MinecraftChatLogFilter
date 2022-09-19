@@ -121,15 +121,22 @@ def filter():
         keyword = request.json['keyword']
         sender_list = request.json['sender_list']
         source_list = request.json['source_list']
+        statistics_type = request.json['statistics_type']
         file_uuid = request.cookies.get('file_uuid')
         with open(
                 os.path.join(app.config['UPLOAD_FOLDER'],
                              file_uuid + '.json')) as f:
             chat_log = json.load(f)
-            chat_log = MinecraftChatLog(chat_log)
+        chat_log = MinecraftChatLog(chat_log)
+        if statistics_type is None:
             filtered_chat_log = chat_log.filter(keyword, sender_list,
                                                 source_list)
             return render_template('data.html', data=filtered_chat_log)
+        elif statistics_type == 'source':
+            statistic_data = chat_log.statistic_source(keyword, sender_list,
+                                                       source_list)
+            return render_template('statistics/source.html',
+                                   data=statistic_data)
     else:
         return redirect(url_for('index'))
 
@@ -153,29 +160,6 @@ def context():
         return redirect(url_for('index'))
 
 
-@app.route('/statistics', methods=['GET', 'POST'])
-def statistics():
-    if request.method == 'POST':
-        keyword = request.json['keyword']
-        sender_list = request.json['sender_list']
-        source_list = request.json['source_list']
-        statistics_type = request.json['statistics_type']
-        file_uuid = request.cookies.get('file_uuid')
-        with open(
-                os.path.join(app.config['UPLOAD_FOLDER'],
-                             file_uuid + '.json')) as f:
-            chat_log = json.load(f)
-            chat_log = MinecraftChatLog(chat_log)
-
-            if statistics_type == 'source':
-                statistics_data = chat_log.statistic_source(
-                    keyword, sender_list, source_list)
-                return render_template('./statistics/source.html',
-                                       data=statistics_data)
-    else:
-        return redirect(url_for('index'))
-
-
 if __name__ == '__main__':
-    # app.debug = True
+    app.debug = True
     app.run()

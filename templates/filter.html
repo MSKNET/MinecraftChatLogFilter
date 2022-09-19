@@ -53,8 +53,8 @@
       {% endfor %}
     </div>
     <br>
-    <a href="javascript:void(0)" onclick="get_source_statistic()">按以上条件统计不同来源占比</a> |
-    <a href="javascript:void(0)" onclick="show_sender()">按以上条件统计不同发送者占比</a>
+    <a href="javascript:void(0)" onclick="apply('source')">按以上条件统计不同来源占比</a> |
+    <a href="javascript:void(0)" onclick="apply('sender')">按以上条件统计不同发送者占比</a>
     <br><br>
     <button onclick="apply()">开始查询符合条件的数据</button>
   </div>
@@ -70,7 +70,7 @@
       }
     }
 
-    function apply() {
+    function apply(statistics_type = null) {
       let keyword = document.getElementById("keyword").value;
       let sender_list = [];
       let source_list = [];
@@ -97,7 +97,8 @@
       xhr.send(JSON.stringify({
         "keyword": keyword,
         "sender_list": sender_list,
-        "source_list": source_list
+        "source_list": source_list,
+        "statistics_type": statistics_type
       }));
     }
 
