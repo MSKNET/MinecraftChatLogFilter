@@ -46,17 +46,22 @@ class MinecraftChatLog:
             context.append(self.chat_log[i])
         return context
 
-    def statistic_source(self, keyword, sender_list, source_list):
+    def statistic(self, keyword, sender_list, source_list, statistics_type):
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
-        statistic_data = {'statistic_source_list': []}
+        statistic_data = {'statistic_dict': {}}
+        statistic_dict = statistic_data['statistic_dict']
         for m in filtered_chat_log:
-            if m['Source'] not in statistic_data['statistic_source_list']:
-                statistic_data["statistic_source_list"].append(m['Source'])
-                statistic_data[m['Source']] = 0
+            if statistics_type == 'sender':
+                key = m['Sender']
+            elif statistics_type == 'source':
+                key = m['Source']
+            if key not in statistic_dict:
+                statistic_dict[key] = 1
             else:
-                statistic_data[m['Source']] += 1
+                statistic_dict[key] += 1
 
         statistic_data['statistic_sender_list'] = sender_list
+        statistic_data['statistic_source_list'] = source_list
         statistic_data['statistic_keyword'] = keyword
         statistic_data['statistic_total_number'] = len(filtered_chat_log)
         return statistic_data
@@ -132,10 +137,10 @@ def filter():
             filtered_chat_log = chat_log.filter(keyword, sender_list,
                                                 source_list)
             return render_template('data.html', data=filtered_chat_log)
-        elif statistics_type == 'source':
-            statistic_data = chat_log.statistic_source(keyword, sender_list,
-                                                       source_list)
-            return render_template('statistics/source.html',
+        else:
+            statistic_data = chat_log.statistic(keyword, sender_list,
+                                                source_list, statistics_type)
+            return render_template('statistics.html',
                                    data=statistic_data)
     else:
         return redirect(url_for('index'))
