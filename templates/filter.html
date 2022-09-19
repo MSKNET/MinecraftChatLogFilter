@@ -12,6 +12,15 @@
 <body>
   <div id="load_files">
     <h1>筛选器</h1>
+    {% if show_import %}
+    <div id="import_files">
+      <h3>自动使用了已上传的文件，可重新导入新文件</h3>
+      <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" accept=".json">
+        <input type="submit" value="上传">
+      </form>
+    </div>
+    {% endif %}
     <h3>内容包含字符串</h3>
     <input placeholder="留空表示无限制" id="keyword" value="">
     <h3>发送者 (共 {{ chat_log.sender_list|length }} 个可选项)

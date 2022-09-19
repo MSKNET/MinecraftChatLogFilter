@@ -59,6 +59,14 @@ def timectime(s):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
+        if 'file_uuid' in request.cookies:
+            file_uuid = request.cookies.get('file_uuid')
+            filename = os.path.join(app.config['UPLOAD_FOLDER'], file_uuid + '.json')
+            if os.path.exists(filename):
+                with open(filename, 'r') as f:
+                    chat_log = json.load(f)
+                chat_log = MinecraftChatLog(chat_log)
+                return render_template('filter.html', chat_log=chat_log, show_import=True)
         return render_template('index.html')
     elif request.method == 'POST':
         file = request.files['file']
