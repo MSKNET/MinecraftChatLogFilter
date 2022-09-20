@@ -51,44 +51,50 @@ class MinecraftChatLog:
         return context
 
     def drawPie(self, statistic_data):
+        if os.name == 'nt':
+            pyplot.rcParams['font.sans-serif'] = ['SimHei', 'SimSun']
+        if os.name == 'posix':
+            pyplot.rcParams['font.sans-serif'] = [
+                'Source Han Sans CN', 'Noto Sans CJK SC'
+            ]
+        statistic_dict = statistic_data['statistic_dict']
+
+        # reverse sort statistic_dict by value
+        statistic_dict = {
+            k: v
+            for k, v in sorted(
+                statistic_dict.items(), key=lambda item: item[1], reverse=True)
+        }
+
+        # merge small values
+        max_size = 9
+        if len(statistic_dict) > max_size:
+            statistic_dict = dict(
+                list(statistic_dict.items())[:max_size - 1] +
+                [('其它', sum(list(statistic_dict.values())[max_size - 1:]))])
+
         sizes = []
         labels = []
         explode = []
-        if os.name == 'nt':
-            pyplot.rcParams['font.sans-serif']=['SimHei','SimSun']
-        if os.name == 'posix':
-            pyplot.rcParams['font-sans-serif']=['Noto Sans CJK SC']
-        statistic_dict = statistic_data['statistic_dict']
-        sorted_result = sorted(statistic_dict.items(), key=lambda item:item[1], reverse=True)
-        sorted_keys = []
-        for index in range(len(sorted_result)):
-            sorted_keys.append(sorted_result[index][0])
-        for key in sorted_keys:
-            if len(labels) >= 8 and '其它' not in labels:
-                labels.append('其它')
-                sizes.append(statistic_dict[key])
-                explode.append(0.005)
-            elif len(labels) >= 8 and '其它' in labels:
-                sizes[-1] = sizes[-1] + statistic_dict[key]
-            elif len(labels) < 8:
-                labels.append(key)
-                sizes.append(statistic_dict[key])
-                explode.append(0.005)
-            
-            
+        for key, value in statistic_dict.items():
+            labels.append(key)
+            sizes.append(value)
+            explode.append(0.005)
+
         image_file = BytesIO()
-        pyplot.figure(figsize=(9,5),dpi=120)
+        pyplot.figure(figsize=(9, 5), dpi=120)
         pyplot.pie(sizes,
-        labels=labels,
-        labeldistance=1,
-        shadow=False,
-        pctdistance=0.5,
-        autopct='%.1f%%',
-        explode=explode,
-        radius=1.4)
+                   labels=labels,
+                   labeldistance=1,
+                   shadow=False,
+                   pctdistance=0.5,
+                   autopct='%.1f%%',
+                   explode=explode,
+                   radius=1.4)
         pyplot.savefig(image_file, format='png')
-        image_file.seek(0)     
-        image_file_base64 = str(base64.b64encode(image_file.getvalue()), 'utf-8')
+        image_file.seek(0)
+        image_file_base64 = str(base64.b64encode(image_file.getvalue()),
+                                'utf-8')
         return image_file_base64
 
     def statistic(self, keyword, sender_list, source_list, statistics_type):
@@ -186,8 +192,7 @@ def filter():
         else:
             statistic_data = chat_log.statistic(keyword, sender_list,
                                                 source_list, statistics_type)
-            return render_template('statistics.html',
-                                   data=statistic_data)
+            return render_template('statistics.html', data=statistic_data)
     else:
         return redirect(url_for('index'))
 
