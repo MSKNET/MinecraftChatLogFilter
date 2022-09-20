@@ -1,8 +1,12 @@
 from flask import Flask, render_template, url_for, request, redirect, make_response
+from io import BytesIO
+from matplotlib import pyplot
 import uuid
 import json
 import os
 import time
+import numpy
+import base64
 
 UPLOAD_FOLDER = 'data'
 # UPLOAD_FOLDER = '/tmp'
@@ -46,6 +50,47 @@ class MinecraftChatLog:
             context.append(self.chat_log[i])
         return context
 
+    def drawPie(self, statistic_data):
+        sizes = []
+        labels = []
+        explode = []
+        if os.name == 'nt':
+            pyplot.rcParams['font.sans-serif']=['SimHei','SimSun']
+        if os.name == 'posix':
+            pyplot.rcParams['font-sans-serif']=['Noto Sans CJK SC']
+        statistic_dict = statistic_data['statistic_dict']
+        sorted_result = sorted(statistic_dict.items(), key=lambda item:item[1], reverse=True)
+        sorted_keys = []
+        for index in range(len(sorted_result)):
+            sorted_keys.append(sorted_result[index][0])
+        for key in sorted_keys:
+            if len(labels) >= 8 and '其它' not in labels:
+                labels.append('其它')
+                sizes.append(statistic_dict[key])
+                explode.append(0.005)
+            elif len(labels) >= 8 and '其它' in labels:
+                sizes[-1] = sizes[-1] + statistic_dict[key]
+            elif len(labels) < 8:
+                labels.append(key)
+                sizes.append(statistic_dict[key])
+                explode.append(0.005)
+            
+            
+        image_file = BytesIO()
+        pyplot.figure(figsize=(9,5),dpi=120)
+        pyplot.pie(sizes,
+        labels=labels,
+        labeldistance=1,
+        shadow=False,
+        pctdistance=0.5,
+        autopct='%.1f%%',
+        explode=explode,
+        radius=1.4)
+        pyplot.savefig(image_file, format='png')
+        image_file.seek(0)     
+        image_file_base64 = str(base64.b64encode(image_file.getvalue()), 'utf-8')
+        return image_file_base64
+
     def statistic(self, keyword, sender_list, source_list, statistics_type):
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
         statistic_data = {'statistic_dict': {}}
@@ -64,6 +109,7 @@ class MinecraftChatLog:
         statistic_data['statistic_source_list'] = source_list
         statistic_data['statistic_keyword'] = keyword
         statistic_data['statistic_total_number'] = len(filtered_chat_log)
+        statistic_data['statistic_pie_base64'] = self.drawPie(statistic_data)
         return statistic_data
 
 

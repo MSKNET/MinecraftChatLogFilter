@@ -35,14 +35,20 @@
 <hr>
 <h3>统计结果</h3>
 
-{% for key, value in data['statistic_dict'].items()|sort(attribute='1', reverse=True) %}
-<p>
-  <span style="color:blue">{{ key }}</span>
-  有 <span style="color:blue">{{ value }}</span>
-  个符合已选统计条件条目，占比
-  <span style="color:blue"> {{ (value/data['statistic_total_number'])*100 }} %</span>
-</p>
-{% endfor %}
+<img src="data:image/png;base64,{{ data['statistic_pie_base64'] }}">
+
+<details>
+  <summary>点击此处查看具体数据（已经过排序）</summary>
+  {% for key, value in data['statistic_dict'].items()|sort(attribute='1', reverse=True) %}
+  <p>
+    <span style="color:blue">{{ key }}</span>
+    有 <span style="color:blue">{{ value }}</span>
+    个符合已选统计条件条目，占比
+    <span style="color:blue"> {{ (value/data['statistic_total_number'])*100 }} %</span>
+  </p>
+  {% endfor %}
+</details>
+
 
 <form method="dialog">
   <menu> <button value="ok">关闭窗口</button></menu>
