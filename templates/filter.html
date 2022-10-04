@@ -58,7 +58,8 @@
     </div>
     <br>
     <a href="javascript:void(0)" onclick="apply('source')">按以上条件统计不同来源占比</a> |
-    <a href="javascript:void(0)" onclick="apply('sender')">按以上条件统计不同发送者占比</a>
+    <a href="javascript:void(0)" onclick="apply('sender')">按以上条件统计不同发送者占比</a> |
+    <a href="javascript:void(0)" onclick="apply('word_cloud')">按以上条件生成词云</a>
     <br><br>
     <button onclick="apply()">开始查询符合条件的数据</button>
   </div>
@@ -90,6 +91,18 @@
           source_list.push(source_elements[i].value);
         }
       }
+
+      if(statistics_type === "word_cloud"){
+        document.getElementById("statistics").showModal();
+        document.getElementById("statistics").innerHTML = `
+        <header>
+          正在处理此请求
+        </header>
+
+        <p>这个过程可能需要一些时间，请勿关闭此窗口或刷新页面。</p>
+        `;
+      }
+
       let xhr = new XMLHttpRequest();
       xhr.open("POST", "/filter", true);
       xhr.setRequestHeader("Content-Type", "application/json");
@@ -98,7 +111,9 @@
           if(statistics_type === null){
             document.getElementById("data").innerHTML = xhr.responseText;
           }else{
-            document.getElementById("statistics").showModal();
+            if(statistics_type !== "word_cloud"){
+              document.getElementById("statistics").showModal();
+            }
             document.getElementById("statistics").innerHTML = xhr.responseText;
           }
         }

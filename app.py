@@ -7,6 +7,8 @@ import os
 import time
 import numpy
 import base64
+import jieba
+from wordcloud import WordCloud
 
 UPLOAD_FOLDER = 'data'
 # UPLOAD_FOLDER = '/tmp'
@@ -95,6 +97,46 @@ class MinecraftChatLog:
         image_file.seek(0)
         image_file_base64 = str(base64.b64encode(image_file.getvalue()),
                                 'utf-8')
+        return image_file_base64
+
+    def word_cloud(self, keyword, sender_list, source_list):
+        if os.name == 'nt':
+            font_path = 'C:\Windows\Fonts\SimHei.ttf'
+        if os.name == 'posix':
+            font_path = ''
+
+        filtered_chat_log = self.filter(keyword, sender_list, source_list)
+        word_list_initial = []
+        text = ''
+        for m in filtered_chat_log:
+            if m['Content'].__contains__('<img src=') == False and m['Content'].__contains__('https:') == False and m['Content'].__contains__('http:') == False:
+                word_list_initial.append(m['Content'])
+
+        # add sender_list to dict
+        for sender in self.sender_list:
+            jieba.add_word(sender)
+
+        text = text.join(word_list_initial)
+        word_list_initial = jieba.lcut(text, cut_all=False)
+        word_list = []
+        for word in word_list_initial:
+            # exclude single character words
+            if len(word) != 1:
+                word_list.append(word)
+
+        text = ' '.join(word_list)
+        image_file = BytesIO()
+        word_cloud_image = WordCloud(
+            background_color='white', font_path=font_path, scale=32, max_words = 2000, collocations=False).generate(text)
+
+        pyplot.figure(figsize=(10, 5))
+        pyplot.axis("off")
+        pyplot.tight_layout(pad=0)
+        pyplot.imshow(word_cloud_image, interpolation='bilinear')
+        pyplot.savefig(image_file, format='png')
+        image_file.seek(0)
+        image_file_base64 = str(base64.b64encode(
+            image_file.getvalue()), 'utf-8')
         return image_file_base64
 
     def statistic(self, keyword, sender_list, source_list, statistics_type):
@@ -189,6 +231,9 @@ def filter():
             filtered_chat_log = chat_log.filter(keyword, sender_list,
                                                 source_list)
             return render_template('data.html', data=filtered_chat_log)
+        elif statistics_type == 'word_cloud':
+            word_cloud = chat_log.word_cloud(keyword, sender_list, source_list)
+            return render_template('wordcloud.html', data=word_cloud)
         else:
             statistic_data = chat_log.statistic(keyword, sender_list,
                                                 source_list, statistics_type)
