@@ -103,13 +103,16 @@ class MinecraftChatLog:
         if os.name == 'nt':
             font_path = 'C:\Windows\Fonts\SimHei.ttf'
         if os.name == 'posix':
-            font_path = ''
+            font_path = '/usr/share/fonts/adobe-source-han-sans/SourceHanSans.ttc'
 
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
         word_list_initial = []
         text = ''
         for m in filtered_chat_log:
-            if m['Content'].__contains__('<img src=') == False and m['Content'].__contains__('https:') == False and m['Content'].__contains__('http:') == False:
+            if m['Content'].__contains__(
+                    '<img src=') == False and m['Content'].__contains__(
+                        'https:') == False and m['Content'].__contains__(
+                            'http:') == False:
                 word_list_initial.append(m['Content'])
 
         # add sender_list to dict
@@ -126,8 +129,11 @@ class MinecraftChatLog:
 
         text = ' '.join(word_list)
         image_file = BytesIO()
-        word_cloud_image = WordCloud(
-            background_color='white', font_path=font_path, scale=32, max_words = 2000, collocations=False).generate(text)
+        word_cloud_image = WordCloud(background_color='white',
+                                     font_path=font_path,
+                                     scale=32,
+                                     max_words=2000,
+                                     collocations=False).generate(text)
 
         pyplot.figure(figsize=(10, 5))
         pyplot.axis("off")
@@ -135,8 +141,8 @@ class MinecraftChatLog:
         pyplot.imshow(word_cloud_image, interpolation='bilinear')
         pyplot.savefig(image_file, format='png')
         image_file.seek(0)
-        image_file_base64 = str(base64.b64encode(
-            image_file.getvalue()), 'utf-8')
+        image_file_base64 = str(base64.b64encode(image_file.getvalue()),
+                                'utf-8')
         return image_file_base64
 
     def statistic(self, keyword, sender_list, source_list, statistics_type):

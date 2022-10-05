@@ -92,7 +92,7 @@
         }
       }
 
-      if(statistics_type === "word_cloud"){
+      if (statistics_type === "word_cloud") {
         document.getElementById("statistics").showModal();
         document.getElementById("statistics").innerHTML = `
         <header>
@@ -108,10 +108,10 @@
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
-          if(statistics_type === null){
+          if (statistics_type === null) {
             document.getElementById("data").innerHTML = xhr.responseText;
-          }else{
-            if(statistics_type !== "word_cloud"){
+          } else {
+            if (statistics_type !== "word_cloud") {
               document.getElementById("statistics").showModal();
             }
             document.getElementById("statistics").innerHTML = xhr.responseText;
