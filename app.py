@@ -5,7 +5,6 @@ import uuid
 import json
 import os
 import time
-import numpy
 import base64
 import jieba
 from wordcloud import WordCloud
