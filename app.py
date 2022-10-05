@@ -19,6 +19,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 FONT_PATH = 'static/SourceHanSans.ttc'
 prop = font_manager.FontProperties(fname=FONT_PATH)
 mpl.rcParams['font.family'] = prop.get_name()
+plt.switch_backend("agg")
 
 
 class MinecraftChatLog:
@@ -126,7 +127,7 @@ class MinecraftChatLog:
                                      max_words=2000,
                                      collocations=False).generate(text)
 
-        plt.figure(figsize=(10, 5))
+        plt.figure(figsize=(10, 5), num=1, clear=True)
         plt.axis("off")
         plt.tight_layout(pad=0)
         plt.imshow(word_cloud_image, interpolation='bilinear')
