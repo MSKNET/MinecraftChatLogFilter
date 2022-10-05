@@ -102,26 +102,21 @@ class MinecraftChatLog:
 
     def word_cloud(self, keyword, sender_list, source_list):
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
-        word_list_initial = []
-        text = ''
-        for m in filtered_chat_log:
-            if m['Content'].__contains__(
-                    '<img src=') == False and m['Content'].__contains__(
-                        'https:') == False and m['Content'].__contains__(
-                            'http:') == False:
-                word_list_initial.append(m['Content'])
+        ignore_list = ['<img src=', 'https:', 'http:']
+        # filter chat log by ignore_list, oh my py is magic(x
+        filtered_chat_log = [
+            m for m in filtered_chat_log
+            if not any(i in m['Content'] for i in ignore_list)
+        ]
 
-        # add sender_list to dict
+        # add sender_list to jieba dictionary
         for sender in self.sender_list:
             jieba.add_word(sender)
 
-        text = text.join(word_list_initial)
-        word_list_initial = jieba.lcut(text, cut_all=False)
-        word_list = []
-        for word in word_list_initial:
-            # exclude single character words
-            if len(word) != 1:
-                word_list.append(word)
+        text = ' '.join([m['Content'] for m in filtered_chat_log])
+        word_list = jieba.lcut(text, cut_all=False)
+        # exclude single character words
+        word_list = [word for word in word_list if len(word) > 1]
 
         text = ' '.join(word_list)
         image_file = BytesIO()
