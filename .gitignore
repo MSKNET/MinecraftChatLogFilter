@@ -1,3 +1,4 @@
 data/*
 !.gitkeep
-water.css
+static/*
+!download.sh

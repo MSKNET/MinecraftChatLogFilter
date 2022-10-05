@@ -1,19 +1,24 @@
 from flask import Flask, render_template, url_for, request, redirect, make_response
 from io import BytesIO
-from matplotlib import pyplot
-import uuid
-import json
-import os
-import time
+from matplotlib import font_manager
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
 import base64
 import jieba
-from wordcloud import WordCloud
+import json
+import matplotlib as mpl
+import os
+import time
+import uuid
 
 UPLOAD_FOLDER = 'data'
 # UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['json'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+FONT_PATH = 'static/SourceHanSans.ttc'
+prop = font_manager.FontProperties(fname=FONT_PATH)
+mpl.rcParams['font.family'] = prop.get_name()
 
 
 class MinecraftChatLog:
@@ -52,12 +57,9 @@ class MinecraftChatLog:
         return context
 
     def drawPie(self, statistic_data):
-        if os.name == 'nt':
-            pyplot.rcParams['font.sans-serif'] = ['SimHei', 'SimSun']
-        if os.name == 'posix':
-            pyplot.rcParams['font.sans-serif'] = [
-                'Source Han Sans CN', 'Noto Sans CJK SC'
-            ]
+        # plt.rcParams['font.sans-serif'] = [
+        #     'Source Han Sans CN', 'Noto Sans CJK SC', 'SimHei', 'SimSun'
+        # ]
         statistic_dict = statistic_data['statistic_dict']
 
         # reverse sort statistic_dict by value
@@ -83,27 +85,22 @@ class MinecraftChatLog:
             explode.append(0.005)
 
         image_file = BytesIO()
-        pyplot.figure(figsize=(9, 5), dpi=120)
-        pyplot.pie(sizes,
-                   labels=labels,
-                   labeldistance=1,
-                   shadow=False,
-                   pctdistance=0.5,
-                   autopct='%.1f%%',
-                   explode=explode,
-                   radius=1.4)
-        pyplot.savefig(image_file, format='png')
+        plt.figure(figsize=(9, 5), dpi=120)
+        plt.pie(sizes,
+                labels=labels,
+                labeldistance=1,
+                shadow=False,
+                pctdistance=0.5,
+                autopct='%.1f%%',
+                explode=explode,
+                radius=1.4)
+        plt.savefig(image_file, format='png')
         image_file.seek(0)
         image_file_base64 = str(base64.b64encode(image_file.getvalue()),
                                 'utf-8')
         return image_file_base64
 
     def word_cloud(self, keyword, sender_list, source_list):
-        if os.name == 'nt':
-            font_path = 'C:\Windows\Fonts\SimHei.ttf'
-        if os.name == 'posix':
-            font_path = '/usr/share/fonts/adobe-source-han-sans/SourceHanSans.ttc'
-
         filtered_chat_log = self.filter(keyword, sender_list, source_list)
         word_list_initial = []
         text = ''
@@ -129,16 +126,16 @@ class MinecraftChatLog:
         text = ' '.join(word_list)
         image_file = BytesIO()
         word_cloud_image = WordCloud(background_color='white',
-                                     font_path=font_path,
+                                     font_path=FONT_PATH,
                                      scale=32,
                                      max_words=2000,
                                      collocations=False).generate(text)
 
-        pyplot.figure(figsize=(10, 5))
-        pyplot.axis("off")
-        pyplot.tight_layout(pad=0)
-        pyplot.imshow(word_cloud_image, interpolation='bilinear')
-        pyplot.savefig(image_file, format='png')
+        plt.figure(figsize=(10, 5))
+        plt.axis("off")
+        plt.tight_layout(pad=0)
+        plt.imshow(word_cloud_image, interpolation='bilinear')
+        plt.savefig(image_file, format='png')
         image_file.seek(0)
         image_file_base64 = str(base64.b64encode(image_file.getvalue()),
                                 'utf-8')
